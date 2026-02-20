@@ -595,10 +595,28 @@
     }
 
     /* Language crossfade */
-    .lang-fading [data-i18n] {
+    .lang-fading [data-i18n],
+    .lang-fading .lang-en,
+    .lang-fading .lang-ko {
       transition: opacity 0.15s ease;
       opacity: 0;
     }
+
+    /* Language-conditional content */
+    .lang-en { display: block; }
+    .lang-ko { display: none; }
+    .lang-en-flex { display: flex; }
+    .lang-ko-flex { display: none; }
+    body.ko .lang-en { display: none; }
+    body.ko .lang-ko { display: block; }
+    body.ko .lang-en-flex { display: none; }
+    body.ko .lang-ko-flex { display: flex; }
+
+    /* Inside flex containers, lang items need flex behavior */
+    .gallery-track > .lang-en { display: block; }
+    .gallery-track > .lang-ko { display: none; }
+    body.ko .gallery-track > .lang-en { display: none; }
+    body.ko .gallery-track > .lang-ko { display: block; }
 
     /* ---- Mobile ---- */
     @media (max-width: 640px) {
@@ -656,7 +674,9 @@ not studying.</h2>
   <div class="demo-section" aria-label="Chat demonstration">
     <div class="demo-inner">
       <p class="demo-label reveal" data-i18n="demo.label">A conversation with Claw</p>
-      <div class="demo-phone reveal d1">
+
+      <!-- EN: French chat with Claw -->
+      <div class="demo-phone reveal d1 lang-en">
         <div class="demo-header">
           <span class="demo-tutor-name">Claw</span>
           <span class="demo-tutor-badge">French</span>
@@ -674,6 +694,27 @@ not studying.</h2>
           <span class="demo-input-placeholder">Écris en français...</span>
         </div>
       </div>
+
+      <!-- KO: Korean chat with Minji -->
+      <div class="demo-phone reveal d1 lang-ko">
+        <div class="demo-header">
+          <span class="demo-tutor-name">Minji</span>
+          <span class="demo-tutor-badge">한국어</span>
+        </div>
+        <div class="demo-chat">
+          <div class="bubble t">안녕! 오늘 뭐 했어? 😊</div>
+          <div class="bubble u">오늘 친구랑 shopping 했어요</div>
+          <div class="bubble t">오 좋다! 뭐 샀어?</div>
+          <div class="bubble u">예쁜 옷이랑 shoes 샀어요</div>
+          <div class="bubble t">ㅋㅋ 잘했어! 거의 완벽해 👍
+            <span class="correction">* "shopping" → "쇼핑", "shoes" → "신발"이라고 하면 더 자연스러워!</span>
+          </div>
+        </div>
+        <div class="demo-input">
+          <span class="demo-input-placeholder">한국어로 써 보세요...</span>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -742,8 +783,8 @@ has a voice</h2>
     <div class="gallery-scroll">
       <div class="gallery-track reveal d1">
 
-        <!-- Chat screen -->
-        <div class="screen-card">
+        <!-- Chat screen — EN -->
+        <div class="screen-card lang-en">
           <div class="screen-label" data-i18n="screen.chat">Chat</div>
           <div class="screen-content">
             <div class="mini-chat">
@@ -756,8 +797,22 @@ has a voice</h2>
           </div>
         </div>
 
-        <!-- Review screen -->
-        <div class="screen-card">
+        <!-- Chat screen — KO -->
+        <div class="screen-card lang-ko">
+          <div class="screen-label" data-i18n="screen.chat">대화</div>
+          <div class="screen-content">
+            <div class="mini-chat">
+              <div class="mini-b t">Salut! Quoi de neuf?</div>
+              <div class="mini-b u">Je suis allé au... market?</div>
+              <div class="mini-b t">Presque! "marché" 라고 해 😊</div>
+              <div class="mini-b u">Ah, au marché!</div>
+              <div class="mini-b t">Voilà, 완벽해! 👌</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review screen — EN -->
+        <div class="screen-card lang-en">
           <div class="screen-label" data-i18n="screen.review">Review</div>
           <div class="screen-content">
             <div class="review-mock">
@@ -774,8 +829,26 @@ has a voice</h2>
           </div>
         </div>
 
-        <!-- Journal screen -->
-        <div class="screen-card">
+        <!-- Review screen — KO -->
+        <div class="screen-card lang-ko">
+          <div class="screen-label" data-i18n="screen.review">복습</div>
+          <div class="screen-content">
+            <div class="review-mock">
+              <div class="review-word">boulangerie</div>
+              <div class="review-reading">불랑주리</div>
+              <div class="review-meaning">빵집</div>
+              <div class="review-btns">
+                <span class="r-btn again">다시</span>
+                <span class="r-btn hard">어려움</span>
+                <span class="r-btn good">좋음</span>
+                <span class="r-btn easy">쉬움</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Journal screen — EN -->
+        <div class="screen-card lang-en">
           <div class="screen-label" data-i18n="screen.journal">Journal</div>
           <div class="screen-content">
             <div class="journal-mock">
@@ -789,8 +862,23 @@ has a voice</h2>
           </div>
         </div>
 
-        <!-- Songs screen -->
-        <div class="screen-card">
+        <!-- Journal screen — KO -->
+        <div class="screen-card lang-ko">
+          <div class="screen-label" data-i18n="screen.journal">일기</div>
+          <div class="screen-content">
+            <div class="journal-mock">
+              <div class="journal-date-mock">2026년 2월 20일</div>
+              <div class="journal-text-mock">오늘 프랑스어로 빵집에서 order 해 봤어요. 처음에는 nervous 했지만 잘 됐어요!</div>
+              <div class="journal-fix">
+                "order" → "주문", "nervous" → "긴장" 👍<br>
+                자연스러운 문장이에요!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Songs screen — EN -->
+        <div class="screen-card lang-en">
           <div class="screen-label" data-i18n="screen.songs">Songs</div>
           <div class="screen-content">
             <div class="song-mock">
@@ -802,6 +890,23 @@ has a voice</h2>
               <div class="song-note">He speaks to me softly</div>
               <div class="song-line">Je vois la vie en rose</div>
               <div class="song-note">I see life through rose-colored glasses</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Songs screen — KO -->
+        <div class="screen-card lang-ko">
+          <div class="screen-label" data-i18n="screen.songs">노래</div>
+          <div class="screen-content">
+            <div class="song-mock">
+              <div class="song-title-mock">La Vie en Rose</div>
+              <div class="song-artist-mock">Édith Piaf</div>
+              <div class="song-line">Quand il me prend dans ses bras</div>
+              <div class="song-note">그가 나를 품에 안을 때</div>
+              <div class="song-line">Il me parle tout bas</div>
+              <div class="song-note">그가 나에게 낮은 목소리로 말해</div>
+              <div class="song-line">Je vois la vie en rose</div>
+              <div class="song-note">장밋빛 인생이 보여</div>
             </div>
           </div>
         </div>
@@ -844,7 +949,7 @@ nothing you don't</h2>
       'hero.subtitle':     { en: 'Your AI language companion', ko: 'AI \uC5B8\uC5B4 \uD559\uC2B5 \uB3D9\uBC18\uC790' },
       'philosophy.quote':  { en: 'Language is learned\nthrough living,\nnot studying.', ko: '\uC5B8\uC5B4\uB294 \uACF5\uBD80\uAC00 \uC544\uB2CC\n\uC0B6 \uC18D\uC5D0\uC11C\n\uBC30\uC6B0\uB294 \uAC83.' },
       'philosophy.body':   { en: 'Colette is a quiet space for language learning. No gamification, no pressure\u00A0\u2014 just thoughtful conversation with AI tutors who feel like friends.', ko: '\uCF5C\uB808\uD2B8\uB294 \uC5B8\uC5B4 \uD559\uC2B5\uC744 \uC704\uD55C \uC870\uC6A9\uD55C \uACF5\uAC04\uC785\uB2C8\uB2E4. \uAC8C\uC774\uBBF8\uD53C\uCF00\uC774\uC158\uB3C4, \uC555\uBC15\uB3C4 \uC5C6\uC774\u00A0\u2014 \uCE5C\uAD6C\uCC98\uB7FC \uB290\uAEF4\uC9C0\uB294 AI \uD29C\uD130\uC640\uC758 \uC0AC\uB824 \uAE4A\uC740 \uB300\uD654\uB9CC \uC788\uC2B5\uB2C8\uB2E4.' },
-      'demo.label':        { en: 'A conversation with Claw', ko: 'Claw\uC640\uC758 \uB300\uD654' },
+      'demo.label':        { en: 'A conversation with Claw', ko: 'Minji\uC640\uC758 \uB300\uD654' },
       'tutors.title':      { en: 'Every language\nhas a voice', ko: '\uBAA8\uB4E0 \uC5B8\uC5B4\uC5D0\uB294\n\uBAA9\uC18C\uB9AC\uAC00 \uC788\uC2B5\uB2C8\uB2E4' },
       'tutor.claw.name':   { en: 'Claw', ko: 'Claw' },
       'tutor.claw.lang':   { en: 'French', ko: '\uD504\uB791\uC2A4\uC5B4' },
