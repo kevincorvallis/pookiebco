@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F9F6F1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Colette — AI Language Companion</title>
+  <meta name="description" content="Learn languages through conversation with AI tutors who feel like friends. French, English, Japanese, Korean.">
+  <meta property="og:title" content="Colette — AI Language Companion">
+  <meta property="og:description" content="Learn languages through conversation, not memorization.">
+  <meta property="og:url" content="https://pookiebco.com">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Noto+Serif+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>C</text></svg>">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: "Cormorant Garamond", "Noto Serif KR", Georgia, serif;
+      background: #F9F6F1;
+      color: #2A2118;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    body.ko {
+      font-family: "Noto Serif KR", "Cormorant Garamond", Georgia, serif;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-thickness: 1px;
+      transition: opacity 0.3s ease;
+    }
+    a:hover { opacity: 0.6; }
+
+    .container {
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    section {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0;
+    }
+
+    /* ---- Language toggle ---- */
+    .lang-toggle {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
+      padding: 24px 28px;
+      padding-top: calc(24px + env(safe-area-inset-top));
+      padding-right: calc(28px + env(safe-area-inset-right));
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .lang-btn {
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: inherit;
+      color: #C4B8AB;
+      cursor: pointer;
+      padding: 4px 0;
+      transition: color 0.3s ease, opacity 0.3s ease;
+      letter-spacing: inherit;
+      text-transform: inherit;
+    }
+    .lang-btn:hover { opacity: 0.6; }
+    .lang-btn.active {
+      color: #2A2118;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-thickness: 1px;
+    }
+
+    /* On dark sections, restyle the toggle */
+    .lang-toggle.on-dark .lang-btn { color: #5a5a70; }
+    .lang-toggle.on-dark .lang-btn.active { color: #a0a0b4; }
+
+    /* ---- Hero ---- */
+    .hero {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-title {
+      font-size: clamp(60px, 14vw, 130px);
+      font-weight: 300;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(18px, 3vw, 24px);
+      font-weight: 300;
+      color: #8C7E71;
+      line-height: 1.5;
+    }
+
+    .scroll-line {
+      position: absolute;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 56px;
+      overflow: hidden;
+    }
+
+    .scroll-line::after {
+      content: "";
+      display: block;
+      width: 1px;
+      height: 100%;
+      background: #C4B8AB;
+      animation: scrollDrift 2.4s ease-in-out infinite;
+    }
+
+    @keyframes scrollDrift {
+      0% { transform: translateY(-100%); opacity: 0; }
+      30% { opacity: 1; }
+      70% { opacity: 1; }
+      100% { transform: translateY(100%); opacity: 0; }
+    }
+
+    /* ---- Philosophy ---- */
+    .philosophy-quote {
+      font-size: clamp(34px, 7vw, 56px);
+      font-weight: 300;
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+      margin-bottom: 48px;
+      white-space: pre-line;
+    }
+
+    .section-body {
+      font-size: clamp(17px, 2.5vw, 21px);
+      font-weight: 300;
+      line-height: 1.7;
+      color: #8C7E71;
+    }
+
+    /* ---- Chat Demo (dark section) ---- */
+    .demo-section {
+      background: #13131f;
+      min-height: auto;
+      padding: 100px 0 120px;
+    }
+
+    .demo-inner {
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 0 28px;
+      text-align: center;
+    }
+
+    .demo-label {
+      font-size: clamp(13px, 2vw, 15px);
+      color: #5a5a70;
+      font-weight: 300;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 36px;
+    }
+
+    .demo-phone {
+      max-width: 380px;
+      margin: 0 auto;
+      background: #1a1a2e;
+      border-radius: 24px;
+      padding: 24px 18px 18px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+    }
+
+    .demo-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .demo-tutor-name {
+      font-size: 15px;
+      font-weight: 500;
+      color: #e2e8f0;
+    }
+
+    .demo-tutor-badge {
+      font-size: 11px;
+      color: #6366f1;
+      background: rgba(99,102,241,0.12);
+      padding: 2px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.03em;
+    }
+
+    .demo-chat {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin-bottom: 18px;
+    }
+
+    .bubble {
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.45;
+      max-width: 84%;
+    }
+
+    .bubble.t {
+      background: #252540;
+      color: #d4d4e0;
+      align-self: flex-start;
+      border-bottom-left-radius: 6px;
+    }
+
+    .bubble.u {
+      background: #6366f1;
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 6px;
+    }
+
+    .bubble .correction {
+      color: #a78bfa;
+      font-style: italic;
+      font-size: 13px;
+      display: block;
+      margin-top: 4px;
+    }
+
+    .demo-input {
+      background: #252540;
+      border-radius: 14px;
+      padding: 13px 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .demo-input-placeholder {
+      color: #4a4a62;
+      font-size: 14px;
+    }
+
+    /* ---- Section headings ---- */
+    .section-heading {
+      font-size: clamp(32px, 6vw, 48px);
+      font-weight: 300;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: 16px;
+      white-space: pre-line;
+    }
+
+    /* ---- Tutors ---- */
+    .tutor-list { list-style: none; margin-top: 64px; }
+    .tutor-item { padding: 28px 0; }
+
+    .tutor-name {
+      font-size: clamp(24px, 4vw, 32px);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+
+    .tutor-lang {
+      font-size: clamp(14px, 2vw, 16px);
+      color: #8C7E71;
+      font-weight: 300;
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+
+    .tutor-desc {
+      font-size: clamp(15px, 2vw, 18px);
+      color: #BEB3A7;
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.55;
+    }
+
+    /* ---- Journey ---- */
+    .journey-list { margin-top: 64px; }
+    .journey-step { margin-bottom: 52px; }
+    .journey-step:last-child { margin-bottom: 0; }
+
+    .journey-step-num {
+      font-size: clamp(12px, 1.5vw, 14px);
+      color: #C4B8AB;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .journey-step-title {
+      font-size: clamp(24px, 4vw, 32px);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+
+    .journey-step-desc {
+      font-size: clamp(16px, 2.2vw, 19px);
+      color: #8C7E71;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    /* ---- App Screens Gallery (dark) ---- */
+    .gallery-section {
+      background: #13131f;
+      min-height: auto;
+      padding: 100px 0 120px;
+    }
+
+    .gallery-heading {
+      font-size: clamp(32px, 6vw, 48px);
+      font-weight: 300;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      color: #e2e8f0;
+      text-align: center;
+      margin-bottom: 56px;
+      white-space: pre-line;
+    }
+
+    .gallery-scroll {
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 0 28px;
+    }
+
+    .gallery-scroll::-webkit-scrollbar { display: none; }
+
+    .gallery-track {
+      display: flex;
+      gap: 20px;
+      width: max-content;
+      padding-right: 28px;
+    }
+
+    @media (min-width: 1080px) {
+      .gallery-track {
+        width: auto;
+        justify-content: center;
+        padding-right: 0;
+      }
+    }
+
+    .screen-card {
+      width: 270px;
+      flex-shrink: 0;
+      background: #1a1a2e;
+      border-radius: 20px;
+      padding: 20px 16px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+    }
+
+    .screen-label {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #5a5a70;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .screen-content {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #d4d4e0;
+    }
+
+    /* Mini chat */
+    .mini-chat { display: flex; flex-direction: column; gap: 7px; }
+
+    .mini-b {
+      padding: 7px 11px;
+      border-radius: 14px;
+      font-size: 12.5px;
+      line-height: 1.4;
+      max-width: 82%;
+    }
+
+    .mini-b.t { background: #252540; color: #b8b8c8; align-self: flex-start; border-bottom-left-radius: 4px; }
+    .mini-b.u { background: #6366f1; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+
+    /* Review card */
+    .review-mock { text-align: center; padding: 16px 0; }
+
+    .review-word {
+      font-size: 30px;
+      font-weight: 400;
+      color: #e2e8f0;
+      margin-bottom: 4px;
+    }
+
+    .review-reading {
+      font-size: 13px;
+      color: #5a5a70;
+      margin-bottom: 16px;
+    }
+
+    .review-meaning {
+      font-size: 15px;
+      color: #a0a0b4;
+      margin-bottom: 20px;
+    }
+
+    .review-btns { display: flex; gap: 8px; justify-content: center; }
+
+    .r-btn {
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .r-btn.again { background: #2d1a1a; color: #ff7b7b; }
+    .r-btn.hard  { background: #2d2618; color: #ffbe6b; }
+    .r-btn.good  { background: #1a2d1e; color: #6bffb8; }
+    .r-btn.easy  { background: #1a1e2d; color: #6ba8ff; }
+
+    /* Journal */
+    .journal-mock { padding: 4px 0; }
+
+    .journal-date-mock {
+      font-size: 11px;
+      color: #5a5a70;
+      margin-bottom: 12px;
+    }
+
+    .journal-text-mock {
+      font-size: 13px;
+      color: #b8b8c8;
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    .journal-fix {
+      font-size: 12px;
+      color: #a0a0b4;
+      padding: 8px 11px;
+      background: #252540;
+      border-radius: 8px;
+      border-left: 2px solid #6366f1;
+      line-height: 1.5;
+    }
+
+    /* Song */
+    .song-mock { padding: 4px 0; }
+
+    .song-title-mock {
+      font-size: 14px;
+      color: #e2e8f0;
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+
+    .song-artist-mock {
+      font-size: 12px;
+      color: #5a5a70;
+      margin-bottom: 16px;
+    }
+
+    .song-line {
+      font-size: 13px;
+      color: #b8b8c8;
+      line-height: 1.5;
+      margin-bottom: 3px;
+    }
+
+    .song-note {
+      font-size: 11px;
+      color: #7a7a90;
+      margin-bottom: 12px;
+      padding-left: 12px;
+      border-left: 1px solid #2d2d44;
+      line-height: 1.5;
+    }
+
+    /* ---- Features ---- */
+    .feature-list { list-style: none; margin-top: 56px; }
+
+    .feature-item {
+      font-size: clamp(19px, 3vw, 24px);
+      font-weight: 300;
+      color: #8C7E71;
+      padding: 14px 0;
+    }
+
+    /* ---- CTA ---- */
+    .cta-section {
+      text-align: center;
+      justify-content: center;
+    }
+
+    .cta-title {
+      font-size: clamp(52px, 11vw, 96px);
+      font-weight: 300;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 32px;
+    }
+
+    .cta-link {
+      font-size: clamp(18px, 3vw, 22px);
+      font-weight: 300;
+      color: #8C7E71;
+    }
+
+    /* ---- Footer ---- */
+    footer {
+      text-align: center;
+      padding: 64px 28px;
+      color: #C4B8AB;
+      font-size: 14px;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+    }
+
+    /* ---- Scroll reveal ---- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .d1 { transition-delay: 0.1s; }
+    .d2 { transition-delay: 0.2s; }
+    .d3 { transition-delay: 0.3s; }
+    .d4 { transition-delay: 0.4s; }
+    .d5 { transition-delay: 0.5s; }
+    .d6 { transition-delay: 0.6s; }
+
+    /* Hero entrance */
+    .hero-enter {
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeUp 1s ease forwards;
+    }
+
+    .hero-enter-1 { animation-delay: 0.3s; }
+    .hero-enter-2 { animation-delay: 0.7s; }
+    .hero-enter-3 { animation-delay: 1.4s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Language crossfade */
+    .lang-fading [data-i18n] {
+      transition: opacity 0.15s ease;
+      opacity: 0;
+    }
+
+    /* ---- Mobile ---- */
+    @media (max-width: 640px) {
+      section { padding: 80px 0; }
+
+      .lang-toggle {
+        padding: 16px 20px;
+        padding-top: calc(16px + env(safe-area-inset-top));
+        padding-right: calc(20px + env(safe-area-inset-right));
+      }
+
+      .tutor-item { padding: 22px 0; }
+      .journey-step { margin-bottom: 40px; }
+
+      .demo-section { padding: 80px 0 100px; }
+      .gallery-section { padding: 80px 0 100px; }
+      .screen-card { width: 250px; }
+    }
+
+    /* ---- Reduced motion ---- */
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .hero-enter { opacity: 1; transform: none; animation: none; }
+      .scroll-line::after { animation: none; opacity: 0.5; transform: none; }
+    }
+  </style>
+</head>
+<body class="en">
+
+  <nav class="lang-toggle" role="navigation" aria-label="Language">
+    <button class="lang-btn active" data-lang="en" aria-label="English">EN</button>
+    <button class="lang-btn" data-lang="ko" aria-label="Korean">KO</button>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero-title hero-enter hero-enter-1" data-i18n="hero.title">Colette</h1>
+      <p class="hero-subtitle hero-enter hero-enter-2" data-i18n="hero.subtitle">Your AI language companion</p>
+    </div>
+    <div class="scroll-line hero-enter hero-enter-3" aria-hidden="true"></div>
+  </section>
+
+  <!-- Philosophy -->
+  <section>
+    <div class="container">
+      <h2 class="philosophy-quote reveal" data-i18n="philosophy.quote">Language is learned
+through living,
+not studying.</h2>
+      <p class="section-body reveal d1" data-i18n="philosophy.body">Colette is a quiet space for language learning. No gamification, no pressure — just thoughtful conversation with AI tutors who feel like friends.</p>
+    </div>
+  </section>
+
+  <!-- Chat Demo -->
+  <div class="demo-section" aria-label="Chat demonstration">
+    <div class="demo-inner">
+      <p class="demo-label reveal" data-i18n="demo.label">A conversation with Claw</p>
+      <div class="demo-phone reveal d1">
+        <div class="demo-header">
+          <span class="demo-tutor-name">Claw</span>
+          <span class="demo-tutor-badge">French</span>
+        </div>
+        <div class="demo-chat">
+          <div class="bubble t">Salut! Comment ça va aujourd'hui? 😊</div>
+          <div class="bubble u">Je suis allé au café ce matin</div>
+          <div class="bubble t">Ah sympa! T'as pris quoi?</div>
+          <div class="bubble u">Un croissant et un café noir</div>
+          <div class="bubble t">Parfait 👌 Tu parles comme un vrai Parisien
+            <span class="correction">* "je suis allé" → nice use of passé composé!</span>
+          </div>
+        </div>
+        <div class="demo-input">
+          <span class="demo-input-placeholder">Écris en français...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tutors -->
+  <section>
+    <div class="container">
+      <h2 class="section-heading reveal" data-i18n="tutors.title">Every language
+has a voice</h2>
+      <ul class="tutor-list">
+        <li class="tutor-item reveal d1">
+          <div class="tutor-name" data-i18n="tutor.claw.name">Claw</div>
+          <div class="tutor-lang" data-i18n="tutor.claw.lang">French</div>
+          <div class="tutor-desc" data-i18n="tutor.claw.desc">Casual and teasing, like a friend who happens to be Parisian.</div>
+        </li>
+        <li class="tutor-item reveal d2">
+          <div class="tutor-name" data-i18n="tutor.justin.name">Justin</div>
+          <div class="tutor-lang" data-i18n="tutor.justin.lang">English</div>
+          <div class="tutor-desc" data-i18n="tutor.justin.desc">Relaxed and patient, always keeping it real.</div>
+        </li>
+        <li class="tutor-item reveal d3">
+          <div class="tutor-name" data-i18n="tutor.himari.name">Himari</div>
+          <div class="tutor-lang" data-i18n="tutor.himari.lang">Japanese</div>
+          <div class="tutor-desc" data-i18n="tutor.himari.desc">Warm and encouraging, adapting to your level naturally.</div>
+        </li>
+        <li class="tutor-item reveal d4">
+          <div class="tutor-name" data-i18n="tutor.minji.name">Minji</div>
+          <div class="tutor-lang" data-i18n="tutor.minji.lang">Korean</div>
+          <div class="tutor-desc" data-i18n="tutor.minji.desc">Friendly and helpful, like a close Korean friend.</div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Journey -->
+  <section>
+    <div class="container">
+      <h2 class="section-heading reveal" data-i18n="journey.title">A natural path</h2>
+      <div class="journey-list">
+        <div class="journey-step reveal d1">
+          <div class="journey-step-num">01</div>
+          <div class="journey-step-title" data-i18n="journey.step1.title">Converse</div>
+          <div class="journey-step-desc" data-i18n="journey.step1.desc">Chat naturally with your tutor about anything.</div>
+        </div>
+        <div class="journey-step reveal d2">
+          <div class="journey-step-num">02</div>
+          <div class="journey-step-title" data-i18n="journey.step2.title">Discover</div>
+          <div class="journey-step-desc" data-i18n="journey.step2.desc">New words surface from real conversation.</div>
+        </div>
+        <div class="journey-step reveal d3">
+          <div class="journey-step-num">03</div>
+          <div class="journey-step-title" data-i18n="journey.step3.title">Review</div>
+          <div class="journey-step-desc" data-i18n="journey.step3.desc">Spaced repetition keeps them with you.</div>
+        </div>
+        <div class="journey-step reveal d4">
+          <div class="journey-step-num">04</div>
+          <div class="journey-step-title" data-i18n="journey.step4.title">Grow</div>
+          <div class="journey-step-desc" data-i18n="journey.step4.desc">Watch your understanding deepen over time.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- App Screens Gallery -->
+  <div class="gallery-section" aria-label="App screens">
+    <h2 class="gallery-heading reveal" data-i18n="gallery.title">See it in action</h2>
+    <div class="gallery-scroll">
+      <div class="gallery-track reveal d1">
+
+        <!-- Chat screen -->
+        <div class="screen-card">
+          <div class="screen-label" data-i18n="screen.chat">Chat</div>
+          <div class="screen-content">
+            <div class="mini-chat">
+              <div class="mini-b t">오늘 뭐 했어?</div>
+              <div class="mini-b u">친구하고 카페에 갔어요</div>
+              <div class="mini-b t">아 좋다! 뭐 마셨어?</div>
+              <div class="mini-b u">아이스 아메리카노요</div>
+              <div class="mini-b t">ㅋㅋ 역시! 잘했어 👍</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review screen -->
+        <div class="screen-card">
+          <div class="screen-label" data-i18n="screen.review">Review</div>
+          <div class="screen-content">
+            <div class="review-mock">
+              <div class="review-word">美味しい</div>
+              <div class="review-reading">おいしい</div>
+              <div class="review-meaning">delicious</div>
+              <div class="review-btns">
+                <span class="r-btn again">Again</span>
+                <span class="r-btn hard">Hard</span>
+                <span class="r-btn good">Good</span>
+                <span class="r-btn easy">Easy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Journal screen -->
+        <div class="screen-card">
+          <div class="screen-label" data-i18n="screen.journal">Journal</div>
+          <div class="screen-content">
+            <div class="journal-mock">
+              <div class="journal-date-mock">February 20, 2026</div>
+              <div class="journal-text-mock">Aujourd'hui j'ai mangé dans un petit restaurant près de la Seine. La nourriture était incroyable.</div>
+              <div class="journal-fix">
+                "mangé dans" → "mangé dans" ✓<br>
+                Nice use of imparfait with "était"!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Songs screen -->
+        <div class="screen-card">
+          <div class="screen-label" data-i18n="screen.songs">Songs</div>
+          <div class="screen-content">
+            <div class="song-mock">
+              <div class="song-title-mock">La Vie en Rose</div>
+              <div class="song-artist-mock">Édith Piaf</div>
+              <div class="song-line">Quand il me prend dans ses bras</div>
+              <div class="song-note">When he takes me in his arms</div>
+              <div class="song-line">Il me parle tout bas</div>
+              <div class="song-note">He speaks to me softly</div>
+              <div class="song-line">Je vois la vie en rose</div>
+              <div class="song-note">I see life through rose-colored glasses</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <section>
+    <div class="container">
+      <h2 class="section-heading reveal" data-i18n="features.title">Everything you need,
+nothing you don't</h2>
+      <ul class="feature-list">
+        <li class="feature-item reveal d1" data-i18n="feature.chat">Free conversation</li>
+        <li class="feature-item reveal d2" data-i18n="feature.lessons">Guided lessons</li>
+        <li class="feature-item reveal d3" data-i18n="feature.journal">Writing journal</li>
+        <li class="feature-item reveal d4" data-i18n="feature.songs">Song exploration</li>
+        <li class="feature-item reveal d5" data-i18n="feature.review">Spaced repetition</li>
+        <li class="feature-item reveal d6" data-i18n="feature.analysis">Error analysis</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <h2 class="cta-title reveal" data-i18n="cta.title">Begin</h2>
+      <a href="https://colette.pookiebco.com" class="cta-link reveal d1" data-i18n="cta.link">Open Colette &rarr;</a>
+    </div>
+  </section>
+
+  <footer>
+    <p data-i18n="footer">Made with care in Seattle</p>
+  </footer>
+
+  <script>
+    const T = {
+      'hero.title':        { en: 'Colette', ko: 'Colette' },
+      'hero.subtitle':     { en: 'Your AI language companion', ko: 'AI \uC5B8\uC5B4 \uD559\uC2B5 \uB3D9\uBC18\uC790' },
+      'philosophy.quote':  { en: 'Language is learned\nthrough living,\nnot studying.', ko: '\uC5B8\uC5B4\uB294 \uACF5\uBD80\uAC00 \uC544\uB2CC\n\uC0B6 \uC18D\uC5D0\uC11C\n\uBC30\uC6B0\uB294 \uAC83.' },
+      'philosophy.body':   { en: 'Colette is a quiet space for language learning. No gamification, no pressure\u00A0\u2014 just thoughtful conversation with AI tutors who feel like friends.', ko: '\uCF5C\uB808\uD2B8\uB294 \uC5B8\uC5B4 \uD559\uC2B5\uC744 \uC704\uD55C \uC870\uC6A9\uD55C \uACF5\uAC04\uC785\uB2C8\uB2E4. \uAC8C\uC774\uBBF8\uD53C\uCF00\uC774\uC158\uB3C4, \uC555\uBC15\uB3C4 \uC5C6\uC774\u00A0\u2014 \uCE5C\uAD6C\uCC98\uB7FC \uB290\uAEF4\uC9C0\uB294 AI \uD29C\uD130\uC640\uC758 \uC0AC\uB824 \uAE4A\uC740 \uB300\uD654\uB9CC \uC788\uC2B5\uB2C8\uB2E4.' },
+      'demo.label':        { en: 'A conversation with Claw', ko: 'Claw\uC640\uC758 \uB300\uD654' },
+      'tutors.title':      { en: 'Every language\nhas a voice', ko: '\uBAA8\uB4E0 \uC5B8\uC5B4\uC5D0\uB294\n\uBAA9\uC18C\uB9AC\uAC00 \uC788\uC2B5\uB2C8\uB2E4' },
+      'tutor.claw.name':   { en: 'Claw', ko: 'Claw' },
+      'tutor.claw.lang':   { en: 'French', ko: '\uD504\uB791\uC2A4\uC5B4' },
+      'tutor.claw.desc':   { en: 'Casual and teasing, like a friend who happens to be Parisian.', ko: '\uD30C\uB9AC\uC9C0\uC559 \uCE5C\uAD6C\uCC98\uB7FC \uD3B8\uC548\uD558\uACE0 \uC7A5\uB09C\uC2A4\uB7EC\uC6B4.' },
+      'tutor.justin.name': { en: 'Justin', ko: 'Justin' },
+      'tutor.justin.lang': { en: 'English', ko: '\uC601\uC5B4' },
+      'tutor.justin.desc': { en: 'Relaxed and patient, always keeping it real.', ko: '\uD3B8\uC548\uD558\uACE0 \uC778\uB0B4\uC2EC \uC788\uB294, \uD56D\uC0C1 \uC9C4\uC194\uD55C.' },
+      'tutor.himari.name': { en: 'Himari', ko: 'Himari' },
+      'tutor.himari.lang': { en: 'Japanese', ko: '\uC77C\uBCF8\uC5B4' },
+      'tutor.himari.desc': { en: 'Warm and encouraging, adapting to your level naturally.', ko: '\uB530\uB73B\uD558\uACE0 \uACA9\uB824\uD558\uB294, \uB808\uBCA8\uC5D0 \uB9DE\uCDB0 \uC790\uC5F0\uC2A4\uB7FD\uAC8C.' },
+      'tutor.minji.name':  { en: 'Minji', ko: 'Minji' },
+      'tutor.minji.lang':  { en: 'Korean', ko: '\uD55C\uAD6D\uC5B4' },
+      'tutor.minji.desc':  { en: 'Friendly and helpful, like a close Korean friend.', ko: '\uB2E4\uC815\uD558\uACE0 \uB3C4\uC6C0\uC774 \uB418\uB294, \uAC00\uAE4C\uC6B4 \uD55C\uAD6D\uC778 \uCE5C\uAD6C.' },
+      'journey.title':       { en: 'A natural path', ko: '\uC790\uC5F0\uC2A4\uB7EC\uC6B4 \uC5EC\uC815' },
+      'journey.step1.title': { en: 'Converse', ko: '\uB300\uD654\uD558\uAE30' },
+      'journey.step1.desc':  { en: 'Chat naturally with your tutor about anything.', ko: '\uD29C\uD130\uC640 \uBB34\uC5C7\uC774\uB4E0 \uC790\uC5F0\uC2A4\uB7FD\uAC8C \uB300\uD654\uD558\uC138\uC694.' },
+      'journey.step2.title': { en: 'Discover', ko: '\uBC1C\uACAC\uD558\uAE30' },
+      'journey.step2.desc':  { en: 'New words surface from real conversation.', ko: '\uC2E4\uC81C \uB300\uD654\uC5D0\uC11C \uC0C8\uB85C\uC6B4 \uB2E8\uC5B4\uB97C \uB9CC\uB098\uC138\uC694.' },
+      'journey.step3.title': { en: 'Review', ko: '\uBCF5\uC2B5\uD558\uAE30' },
+      'journey.step3.desc':  { en: 'Spaced repetition keeps them with you.', ko: '\uAC04\uACA9 \uBC18\uBCF5\uC774 \uAE30\uC5B5\uC744 \uC9C0\uCF1C\uC90D\uB2C8\uB2E4.' },
+      'journey.step4.title': { en: 'Grow', ko: '\uC131\uC7A5\uD558\uAE30' },
+      'journey.step4.desc':  { en: 'Watch your understanding deepen over time.', ko: '\uC2DC\uAC04\uC774 \uC9C0\uB098\uBA70 \uC774\uD574\uAC00 \uAE4A\uC5B4\uC9C0\uB294 \uAC83\uC744 \uB290\uAEF4\uBCF4\uC138\uC694.' },
+      'gallery.title':  { en: 'See it in action', ko: '\uC9C1\uC811 \uD655\uC778\uD574 \uBCF4\uC138\uC694' },
+      'screen.chat':    { en: 'Chat', ko: '\uB300\uD654' },
+      'screen.review':  { en: 'Review', ko: '\uBCF5\uC2B5' },
+      'screen.journal': { en: 'Journal', ko: '\uC77C\uAE30' },
+      'screen.songs':   { en: 'Songs', ko: '\uB178\uB798' },
+      'features.title':  { en: 'Everything you need,\nnothing you don\u2019t', ko: '\uD544\uC694\uD55C \uBAA8\uB4E0 \uAC83,\n\uBD88\uD544\uC694\uD55C \uAC83\uC740 \uC5C6\uC774' },
+      'feature.chat':     { en: 'Free conversation', ko: '\uC790\uC720 \uB300\uD654' },
+      'feature.lessons':  { en: 'Guided lessons', ko: '\uAC00\uC774\uB4DC \uB808\uC2A8' },
+      'feature.journal':  { en: 'Writing journal', ko: '\uC791\uBB38 \uC77C\uAE30' },
+      'feature.songs':    { en: 'Song exploration', ko: '\uB178\uB798 \uD0D0\uAD6C' },
+      'feature.review':   { en: 'Spaced repetition', ko: '\uAC04\uACA9 \uBC18\uBCF5' },
+      'feature.analysis': { en: 'Error analysis', ko: '\uC624\uB958 \uBD84\uC11D' },
+      'cta.title':  { en: 'Begin', ko: '\uC2DC\uC791\uD558\uAE30' },
+      'cta.link':   { en: 'Open Colette \u2192', ko: 'Colette \uC5F4\uAE30 \u2192' },
+      'footer':     { en: 'Made with care in Seattle', ko: '\uC2DC\uC560\uD2C0\uC5D0\uC11C \uC815\uC131\uC744 \uB2F4\uC544' },
+    };
+
+    let lang = 'en';
+
+    function setLang(l) {
+      if (l === lang) return;
+      document.body.classList.add('lang-fading');
+
+      setTimeout(() => {
+        lang = l;
+        document.body.classList.remove('en', 'ko');
+        document.body.classList.add(l);
+        document.documentElement.lang = l;
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.getAttribute('data-i18n');
+          if (T[key]?.[l]) el.textContent = T[key][l];
+        });
+
+        document.querySelectorAll('.lang-btn').forEach(b =>
+          b.classList.toggle('active', b.dataset.lang === l)
+        );
+
+        requestAnimationFrame(() => {
+          document.body.classList.remove('lang-fading');
+        });
+      }, 160);
+    }
+
+    document.querySelectorAll('.lang-btn').forEach(b =>
+      b.addEventListener('click', () => setLang(b.dataset.lang))
+    );
+
+    // Scroll reveal
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+    // Fade scroll indicator
+    const line = document.querySelector('.scroll-line');
+    if (line) {
+      let gone = false;
+      window.addEventListener('scroll', () => {
+        if (!gone && window.scrollY > 80) {
+          line.style.transition = 'opacity 0.6s ease';
+          line.style.opacity = '0';
+          gone = true;
+        }
+      }, { passive: true });
+    }
+
+    // Restyle lang toggle on dark sections
+    const toggle = document.querySelector('.lang-toggle');
+    const darkSections = document.querySelectorAll('.demo-section, .gallery-section');
+    const toggleObs = new IntersectionObserver(entries => {
+      const anyDarkVisible = [...darkSections].some(s => {
+        const r = s.getBoundingClientRect();
+        return r.top < 60 && r.bottom > 60;
+      });
+      toggle.classList.toggle('on-dark', anyDarkVisible);
+    }, { threshold: 0, rootMargin: '-59px 0px -90% 0px' });
+
+    darkSections.forEach(s => toggleObs.observe(s));
+  </script>
+</body>
+</html>
